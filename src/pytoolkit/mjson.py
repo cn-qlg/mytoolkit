@@ -1,6 +1,6 @@
 import json
 from collections.abc import Mapping
-from typing import Any, Union
+from typing import Any, List, Union
 
 
 def _is_basic_type(item: Any):
@@ -13,7 +13,7 @@ class MJson(Mapping):
     def __init__(self, value: dict):
         self._value = value
 
-    def __getitem__(self, key: Union[str, int, list[Union[int, str]]]):
+    def __getitem__(self, key: Union[str, int, List[Union[int, str]]]):
         if isinstance(key, str):
             return self._value[key]
 
@@ -45,3 +45,9 @@ class MJson(Mapping):
     def loads(cls, s, **kw) -> "MJson":
         value = json.loads(s, **kw)
         return MJson(value)
+
+    def get(self, key: Union[str, int, List[Union[int, str]]], default: Any = None):
+        try:
+            return self.__getitem__(key)
+        except (KeyError, IndexError):
+            return default
