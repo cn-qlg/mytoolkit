@@ -1,6 +1,6 @@
 import unittest
 
-from pytoolkit.mjson import MJson
+from mytoolkit.mjson import MJson
 
 json_str = """
 {
