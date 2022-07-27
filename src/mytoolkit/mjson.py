@@ -1,4 +1,5 @@
 import json
+import sys
 from collections.abc import Mapping
 from typing import Any, List, Union
 
@@ -15,11 +16,11 @@ class MJson(Mapping):
 
     def __getitem__(self, key: Union[str, int, List[Union[int, str]]]):
         if isinstance(key, str):
-            return self._value[key]
-
-        t_value = self._value
-        for k in key:
-            t_value = t_value[k]
+            t_value = self._value[key]
+        else:
+            t_value = self._value
+            for k in key:
+                t_value = t_value[k]
         if _is_basic_type(t_value):
             return t_value
         else:
@@ -41,6 +42,10 @@ class MJson(Mapping):
     def __repr__(self) -> str:
         return self.__str__()
 
+    @property
+    def value(self):
+        return self._value
+
     @classmethod
     def loads(cls, s, **kw) -> "MJson":
         value = json.loads(s, **kw)
@@ -51,3 +56,30 @@ class MJson(Mapping):
             return self.__getitem__(key)
         except (KeyError, IndexError):
             return default
+
+    def find_by_key(self, key: str, count: int = -1):
+        if count <= 0:
+            count = sys.maxsize
+        res = []
+        temp_nodes = [self]
+        while temp_nodes:
+            node = temp_nodes.pop(0)
+            if isinstance(node.value, dict):
+                for k, v in node.items():
+                    if k == key:
+                        res.append(v)
+                        if len(res) == count:
+                            return res
+                    if not _is_basic_type(v):
+                        temp_nodes.append(v)
+            elif isinstance(node.value, list):
+                for v in node:
+                    if not _is_basic_type(v):
+                        temp_nodes.append(v)
+        return res
+
+    def find_one_by_key(self, key: str):
+        res = self.find_by_key(key, 1)
+        if res:
+            return res[0]
+        return None

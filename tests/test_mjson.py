@@ -143,6 +143,14 @@ class TestMjson(unittest.TestCase):
         for _, image in enumerate(value["products", 0, "images"]):
             self.assertTrue(image.startswith("https://dummyjson.com/image/i/products/1/"))
 
+    def test_find_by_key(self):
+        value = MJson.loads(json_str)
+        self.assertEqual(value.find_by_key("id"), [1, 2, 3, 4, 5])
+
+    def test_find_one_by_key(self):
+        value = MJson.loads(json_str)
+        self.assertEqual(value.find_one_by_key("id"), 1)
+
 
 if __name__ == '__main__':
     unittest.main()
