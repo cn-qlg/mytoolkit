@@ -151,6 +151,11 @@ class TestMjson(unittest.TestCase):
         value = MJson.loads(json_str)
         self.assertEqual(value.find_one_by_key("id"), 1)
 
+    def test_get_value(self):
+        value = MJson.loads(json_str)
+        self.assertTrue(isinstance(value["products", 0, "images"], MJson))
+        self.assertTrue(isinstance(value.get_value(["products", 0, "images"]), list))
+
 
 if __name__ == '__main__':
     unittest.main()
