@@ -57,6 +57,16 @@ class MJson(Mapping):
         except (KeyError, IndexError):
             return default
 
+    def get_value(self, key: Union[str, int, List[Union[int, str]]], default: Any = None):
+        try:
+            res = self.__getitem__(key)
+            if isinstance(res, MJson):
+                return res._value
+            else:
+                return res
+        except (KeyError, IndexError):
+            return default
+
     def find_by_key(self, key: str, count: int = -1):
         if count <= 0:
             count = sys.maxsize
