@@ -193,7 +193,7 @@ class BaseModel(DataClass):
         ordered: bool = False,
         ignore_duplicated: bool = False,
         **kwargs
-    ) -> "InsertManyResult":
+    ) -> Tuple["InsertManyResult", int]:
         """Wraps the "insert_many()" of pymongo.
         When use `ignore_duplicated` function, please make sure the `ordered` is ``False``
 
@@ -223,14 +223,17 @@ class BaseModel(DataClass):
             #  ignore duplicate error must use with ordered=False
             ordered = False
         try:
-            return coll.insert_many(insert_data, ordered=ordered, **kwargs)
+            res = coll.insert_many(insert_data, ordered=ordered, **kwargs)
+            return res, len(res.inserted_ids)
         except BulkWriteError as e:
             if not ignore_duplicated:
                 raise e
             # copy from https://stackoverflow.com/a/44838740
             panic = filter(lambda x: x['code'] != 11000, e.details['writeErrors'])  # type: ignore
-            if len(panic) > 0:
+            if len(list(panic)):
                 raise e
+            duplicated_cnt = len(e.details['writeErrors'])
+            return None, len(documents) - duplicated_cnt
 
     @classmethod
     def delete_many(cls, filter, **kwargs) -> "DeleteResult":
