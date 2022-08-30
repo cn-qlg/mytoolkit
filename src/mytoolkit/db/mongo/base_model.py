@@ -79,7 +79,7 @@ class BaseModel(DataClass):
         """
         replacer = DictReplacer(replace_enum=True, id_to_objectid=True)
         filter = replacer.replace_dict(filter)
-        return cls.class_collection().count(filter)
+        return cls.class_collection().count_documents(filter)
 
     @classmethod
     def find(

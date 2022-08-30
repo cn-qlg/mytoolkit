@@ -76,6 +76,9 @@ class TestMongoModel(unittest.TestCase):
         res, d = Student.insert_many(students, ignore_duplicated=True)
         print(res, d)
 
+    def test_count(self):
+        self.assertTrue(Student.count({}) > 0)
+
 
 if __name__ == '__main__':
     from mytoolkit.db.mongo.connection import connect
